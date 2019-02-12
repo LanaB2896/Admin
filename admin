@@ -1,0 +1,246 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Text;
+using System.Data.SqlClient;
+public partial class AdminForm : System.Web.UI.Page
+{
+    New_CRUD.CommonClass comClass = new New_CRUD.CommonClass();
+    protected void Page_Load(object sender, EventArgs e)
+    {
+
+    }
+
+    public string encryptpass(string password)
+    {
+        string msg = "";
+        byte[] encode = new byte[password.Length];
+        // encode = encoding
+        encode = Encoding.UTF8.GetBytes(password);
+        msg = Convert.ToBase64String(encode);
+        return msg;
+    }  
+    protected void UserLogin_Click(object sender, EventArgs e)
+    {
+        string strpass = encryptpass(PasswordTextBox.Text);
+        SqlConnection con =  comClass.ConnectionOpen();
+        con.Open();
+        SqlCommand check_User_Name = new SqlCommand("SELECT * FROM security WHERE UserName = @user and Password = @password and Role ='ADMIN'", con);
+        check_User_Name.Parameters.AddWithValue("@user", UserTextBox.Text);
+        check_User_Name.Parameters.AddWithValue("@password", strpass);
+        SqlDataReader reader = check_User_Name.ExecuteReader();
+
+        if (reader.HasRows)
+        {
+            Response.Redirect("CreateUserForm.aspx");
+        }
+
+        else if (string.IsNullOrEmpty(UserTextBox.Text) && !string.IsNullOrEmpty(PasswordTextBox.Text))
+        {
+            string script = "alert(\"Please Enter Username  to LOGIN!\");";
+            ScriptManager.RegisterStartupScript(this, GetType(),
+                                  "ServerControlScript", script, true);
+        }
+        else if (!string.IsNullOrEmpty(UserTextBox.Text) && string.IsNullOrEmpty(PasswordTextBox.Text))
+        {
+            string script = "alert(\"Please Enter Password to LOGIN!\");";
+            ScriptManager.RegisterStartupScript(this, GetType(),
+                                  "ServerControlScript", script, true);
+        }
+        else if (string.IsNullOrEmpty(UserTextBox.Text) && string.IsNullOrEmpty(PasswordTextBox.Text))
+        {
+            string script = "alert(\"Please Enter the  USERNAME or PASSWORD!\");";
+            ScriptManager.RegisterStartupScript(this, GetType(),
+                                  "ServerControlScript", script, true);
+        }
+
+        else
+        {
+            string script = "alert(\"Invalid USERNAME or PASSWORD!\");";
+            ScriptManager.RegisterStartupScript(this, GetType(),
+                                  "ServerControlScript", script, true);
+        }
+
+
+        con.Close();
+    }
+    protected void UserTextBox_TextChanged(object sender, EventArgs e)
+    {
+
+    }
+    protected void PasswordTextBox_TextChanged(object sender, EventArgs e)
+    {
+
+    }
+}
+
+***********************************************************************************************************
+
+
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data.SqlClient;
+using System.Text;
+public partial class CreateUserForm : System.Web.UI.Page
+{
+    New_CRUD.CommonClass comClass = new New_CRUD.CommonClass();
+    protected void Page_Load(object sender, EventArgs e)
+    {
+
+    }
+    protected void UserTextBox_TextChanged(object sender, EventArgs e)
+    {
+
+    }
+    protected void PasswordTextBox_TextChanged(object sender, EventArgs e)
+    {
+
+    }
+    public string encryptpass(string password)
+    {
+        string msg = "";
+        byte[] encode = new byte[password.Length];
+        encode = Encoding.UTF8.GetBytes(password);
+        msg = Convert.ToBase64String(encode);
+        return msg;
+    }
+    protected void UserLogin_Click(object sender, EventArgs e)
+    {
+        SqlConnection con = comClass.ConnectionOpen();
+
+
+
+
+        if (string.IsNullOrEmpty(UserTextBox.Text) && !string.IsNullOrEmpty(PasswordTextBox.Text))
+        {
+            string script = "alert(\"Please Enter Username to LOGIN!\");";
+            ScriptManager.RegisterStartupScript(this, GetType(),
+                                  "ServerControlScript", script, true);
+        }
+        else if (!string.IsNullOrEmpty(UserTextBox.Text) && String.IsNullOrEmpty(PasswordTextBox.Text))
+        {
+            string script = "alert(\"Please Enter Password to LOGIN!\");";
+            ScriptManager.RegisterStartupScript(this, GetType(),
+                                  "ServerControlScript", script, true);
+        }
+        else if (string.IsNullOrEmpty(UserTextBox.Text) && string.IsNullOrEmpty(PasswordTextBox.Text))
+        {
+            string script = "alert(\"Please Enter Username and  Password to Create Account!\");";
+            ScriptManager.RegisterStartupScript(this, GetType(),
+                                  "ServerControlScript", script, true);
+
+        }
+
+        else
+        {
+            string strpass = encryptpass(PasswordTextBox.Text);
+            SqlCommand cmd = new SqlCommand("insert into security values(@name,@pass,'USER')", con);
+            cmd.Parameters.AddWithValue("@name", UserTextBox.Text);
+            cmd.Parameters.AddWithValue("@pass", strpass);
+            con.Open();
+            int i = cmd.ExecuteNonQuery();
+            string script = "alert(\"Login succsesful!\");";
+            ScriptManager.RegisterStartupScript(this, GetType(),
+                                  "ServerControlScript", script, true);
+             Response.Redirect("LOGIN.aspx");
+
+
+        }
+
+
+
+
+        con.Close();
+
+
+    }
+}
+
+*************************************************************************************************************************
+
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data.SqlClient;
+using System.Text;
+public partial class LOGIN : System.Web.UI.Page
+{
+    New_CRUD.CommonClass comClass = new New_CRUD.CommonClass();
+
+    protected void Page_Load(object sender, EventArgs e)
+    {
+
+    }
+    protected void UserTextBox_TextChanged(object sender, EventArgs e)
+    {
+
+    }
+    protected void PasswordTextBox_TextChanged(object sender, EventArgs e)
+    {
+
+    }
+    public string encryptpass(string password)
+    {
+        string msg = "";
+        byte[] encode = new byte[password.Length];
+        // encode = encoding
+        encode = Encoding.UTF8.GetBytes(password);
+        msg = Convert.ToBase64String(encode);
+        return msg;
+    }  
+    protected void UserLogin_Click(object sender, EventArgs e)
+    {
+        SqlConnection con = comClass.ConnectionOpen();
+        con.Open();
+        string strpass = encryptpass(PasswordTextBox.Text);
+
+        SqlCommand check_User_Name = new SqlCommand("SELECT * FROM security WHERE UserName = @user and Password = @password and Role='USER'", con);
+        check_User_Name.Parameters.AddWithValue("@user", UserTextBox.Text);
+        check_User_Name.Parameters.AddWithValue("@password", strpass);
+        SqlDataReader reader = check_User_Name.ExecuteReader();
+
+        if (reader.HasRows)
+        {
+            Session["userame"] = UserTextBox.Text;
+            Response.Redirect("BasicOperation.aspx");
+        }
+        else if (string.IsNullOrEmpty(UserTextBox.Text)&& !string.IsNullOrEmpty(PasswordTextBox.Text))
+        {
+            string script = "alert(\"Please Enter Username to LOGIN!\");";
+            ScriptManager.RegisterStartupScript(this, GetType(),
+                                  "ServerControlScript", script, true);
+        }
+        else if (!string.IsNullOrEmpty(UserTextBox.Text) && String.IsNullOrEmpty(PasswordTextBox.Text))
+        {
+            string script = "alert(\"Please Enter Password to LOGIN!\");";
+            ScriptManager.RegisterStartupScript(this, GetType(),
+                                  "ServerControlScript", script, true);
+        }
+        else if(string.IsNullOrEmpty(UserTextBox.Text)&& string.IsNullOrEmpty(PasswordTextBox.Text))
+        {
+            string script = "alert(\"Please Enter Username and  Password to LOGIN!\");";
+            ScriptManager.RegisterStartupScript(this, GetType(),
+                                  "ServerControlScript", script, true);
+
+        }
+        else
+        {
+            string script = "alert(\"Invalid USERNAME or PASSWORD!\");";
+            ScriptManager.RegisterStartupScript(this, GetType(),
+                                  "ServerControlScript", script, true);
+        }
+        con.Close();
+    }
+}
